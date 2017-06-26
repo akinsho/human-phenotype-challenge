@@ -1,7 +1,7 @@
 {
-  "name": "React-Boilerplate",
+  "name": "human-phenotype-visualisation",
   "version": "1.0.0",
-  "description": "A Boilerplate setup for new react projects",
+  "description": "A Vizualisation of the human phenotype ontology",
   "main": "index.js",
   "author": "Akin Sowemimo",
   "license": "MIT",
@@ -23,10 +23,8 @@
   "dependencies": {
     "babel-polyfill": "^6.23.0",
     "babel-runtime": "^6.23.0",
-    "bionode-obo": "^0.1.1",
     "isomorphic-fetch": "^2.2.1",
     "react": "^15.5.4",
-    "react-dom": "^15.5.4",
-    "request": "^2.81.0"
+    "react-dom": "^15.5.4"
   }
 }
