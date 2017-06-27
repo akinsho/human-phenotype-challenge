@@ -2,14 +2,14 @@ import React, { Component } from 'react';
 import Graph from 'react-graph-vis';
 import data from './../../../hpo.json';
 
-//console.log('data', data);
+console.log('data', data);
 
-const nodes = data.slice(10, 20).map(node => {
-  return {
-    id: node.id[0],
-    label: node.name[0]
-  };
-});
+//const nodes = data.slice(10, 20).map(node => {
+//return {
+//id: node.id,
+//label: node.name[0]
+//};
+//});
 
 const graph = {
   nodes: [
