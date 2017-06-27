@@ -4,11 +4,11 @@ import data from './../../../hpo.json';
 
 const Nav = styled.nav`
   width: 100%;
-  height: 10%;
+  height: 5%;
   background-color:#2196F3;
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: space-around;
   padding: 1em;
 `;
 

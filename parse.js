@@ -31,8 +31,10 @@ const parseStanza = stanzaText =>
                 if (!parent.relatives) {
                   parent.relatives = { parents: [], children: [] };
                 }
-
-                parent.relatives.children.push(stanza.id);
+                const { children } = parent.relatives;
+                if (children.indexOf(stanza.id) === -1) {
+                  children.push(stanza.id);
+                }
               }
             });
           }
