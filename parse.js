@@ -10,15 +10,16 @@ const parseStanza = stanzaText =>
   stanzaText
     .trim()
     .split(/\[Term\]|\[TypeDef\]/)
-    .map((item, currentLine, array) =>
+    .reduce((terms, item, currentLine, array) => {
       item.split('\n').reduce((stanza, currentLine) => {
         const separatorIndex = currentLine.indexOf(':');
         const key = currentLine.slice(0, separatorIndex);
         const val = currentLine.slice(separatorIndex + 1).trim();
+
         if (key) {
           if (key === 'is_a') {
-            //Take the id i.e HP number to make looking up parents clearer
-            stanza.parents = val.split(' ')[0];
+            stanza.relatives = { parents: [], children: [] };
+            stanza.relatives.parents.push(val.split(' ')[0]);
           }
           if (!Array.isArray(stanza[key])) {
             stanza[key] = [];
@@ -26,23 +27,24 @@ const parseStanza = stanzaText =>
           } else {
             stanza[key] = val;
           }
+          terms[stanza.id] = stanza;
+
+          if (stanza.relatives) {
+            stanza.relatives.parents.forEach(item => {
+              if (terms[item]) {
+                if (!terms[item].relatives) {
+                  terms[item].relatives = { parents: [], children: [] };
+                }
+
+                terms[item].relatives.children.push(item);
+              }
+            });
+          }
         }
         return stanza;
-      }, {})
-    );
-
-function addChildren(stanzas, lookup) {
-  return stanzas.map(stanza => {
-    if (stanza.parents) {
-      const parent = lookup[stanza.id];
-      if (parent) {
-        parent.children = [];
-        parent.children.push(stanza.id[0]);
-      }
-    }
-    return lookup;
-  });
-}
+      }, {});
+      return terms;
+    }, {});
 
 async function fetchAndParse(url) {
   const data = await fetch(url)
@@ -56,11 +58,6 @@ async function fetchAndParse(url) {
     .catch(e => new Error(e.message));
   //return data and write the file
   fs.writeFileSync('hpo.json', JSON.stringify(data, null, 2));
-  const lookup = data.reduce((terms, item) => {
-    terms[item.id] = item;
-    return terms;
-  }, {});
-  console.log(addChildren(data, lookup));
   return data;
 }
 
