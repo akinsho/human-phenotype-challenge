@@ -1,6 +1,17 @@
 import React, { Component } from 'react';
 import Graph from 'react-graph-vis';
+import styled from 'styled-components';
+import SearchBar from './SearchBar.jsx';
+
 import data from './../../../hpo.json';
+
+const Container = styled.div`
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+`;
 
 const hpo = Object.values(data);
 
@@ -61,9 +72,20 @@ const events = {
   }
 };
 
+const names = Object.values(data)
+  .map(phenotype => {
+    return phenotype.name;
+  })
+  .slice(100, 150);
+
 class Phenotypes extends Component {
   render() {
-    return <Graph graph={graph} options={options} events={events} />;
+    return (
+      <Container>
+        <SearchBar data={names} />
+        <Graph graph={graph} options={options} events={events} />;
+      </Container>
+    );
   }
 }
 
