@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import Graph from 'react-graph-vis';
 import data from './../../../hpo.json';
 
-const hpoArray = Object.values(data);
+const hpo = Object.values(data);
 
 const createNode = node => {
   if (typeof node === 'string') {
@@ -22,20 +22,24 @@ const createNode = node => {
   };
 };
 
-const firstNode = createNode(hpoArray[30]);
+const createEdges = (children, firstNode) =>
+  children.map(child => ({
+    from: firstNode.id,
+    to: child.id
+  }));
 
-const children = firstNode.children.map(child => createNode(child));
-
-const createEdges = children => {
-  return children.map(child => {
-    return {
-      from: firstNode.id,
-      to: child.id
-    };
-  });
+const combineEdgesAndNodes = () => {
+  const firstNode = createNode(hpo[30]);
+  const children = firstNode.children.map(child => createNode(child));
+  const edges = createEdges(children, firstNode);
+  return {
+    firstNode,
+    children,
+    edges
+  };
 };
 
-const edges = createEdges(children);
+const { firstNode, children, edges } = combineEdgesAndNodes();
 
 const graph = {
   nodes: [firstNode, ...children],

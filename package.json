@@ -26,6 +26,7 @@
     "isomorphic-fetch": "^2.2.1",
     "react": "^15.5.4",
     "react-dom": "^15.5.4",
-    "react-graph-vis": "^0.1.2"
+    "react-graph-vis": "^0.1.2",
+    "styled-components": "^2.1.0"
   }
 }
