@@ -31,46 +31,36 @@ const parseStanza = stanzaText =>
       }, {})
     );
 
-function addChildren(stanzas) {
+function addChildren(stanzas, lookup) {
   return stanzas.map(stanza => {
     if (stanza.parents) {
-      const parentStanza = stanzas.find(item => {
-        console.log('item', item);
-        return item['id'] === stanza.parents;
-      });
-      console.log('parent', parentStanza);
-      if (parentStanza) {
-        parentStanza.children = [];
-        parentStanza.children.push(stanza.id);
+      const parent = lookup[stanza.id];
+      if (parent) {
+        parent.children = [];
+        parent.children.push(stanza.id[0]);
       }
     }
-    return stanza;
+    return lookup;
   });
 }
 
 async function fetchAndParse(url) {
   const data = await fetch(url)
-    .then(res => {
-      if (res.ok) {
-        return res.text();
-      } else {
-        throw new Error('Could not fetch data');
-      }
-    })
+    .then(res => res.text())
     .then(text => {
       if (!fs.existsSync('HPO.obo')) {
         fs.writeFileSync('HPO.obo', text);
       }
       return parseStanza(text);
-    });
-  //return data and write or write the file
+    })
+    .catch(e => new Error(e.message));
+  //return data and write the file
   fs.writeFileSync('hpo.json', JSON.stringify(data, null, 2));
   const lookup = data.reduce((terms, item) => {
     terms[item.id] = item;
     return terms;
   }, {});
-  console.log('updatedData', addChildren(data));
-  //console.log('looku', lookup);
+  console.log(addChildren(data, lookup));
   return data;
 }
 
