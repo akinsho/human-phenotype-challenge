@@ -13,19 +13,14 @@ const Container = styled.div`
   align-items: center;
 `;
 
-const StyledGraph = styled(Graph)`
-  width: 100%;
-  height: 80%;
-`;
-
 const HPO = Object.values(data);
 
 const options = {
   layout: {
-    randomSeed: undefined,
+    //randomSeed: undefined,
     hierarchical: {
-      enabled: false,
-      nodeSpacing: 200
+      enabled: true,
+      nodeSpacing: 300
     }
   },
   edges: {
@@ -45,66 +40,60 @@ const events = {
 
 class Phenotypes extends Component {
   state = {
-    selected: '',
+    selected: HPO[125],
     graph: {}
   };
 
   componentDidMount() {
-    const { firstNode, children, edges } = this.combineEdgesAndNodes();
-    this.setState({
-      graph: {
-        nodes: [firstNode, ...children],
-        edges
-      }
-    });
+    const { nodes, edges } = this.combineEdgesAndNodes();
+    this.setState({ graph: { nodes, edges } });
   }
 
+  /**
+   * Takes a phenotype object or id and returns a graph node object
+   *
+   * @param {String or Object} node A phenotype object or the id of one
+   * @returns {Object} A graph node with a label, id and its children
+   */
   createNode = node => {
-    let id, name, relatives, children;
+    let id, label, relatives, children, parents;
     if (typeof node === 'string') {
       const childNode = data[node];
-      ({ id, name, relatives: { children } } = childNode);
+      ({ id, name: label, relatives: { children, parents } } = childNode);
     } else {
-      ({ id, name, relatives: { children } } = node);
+      ({ id, name: label, relatives: { children, parents } } = node);
     }
-    return {
-      id,
-      label: name,
-      children
-    };
+    return { id, label, children, parents };
   };
 
-  createEdges = (children, firstNode) =>
-    children.map(child => {
-      return {
-        from: firstNode.id,
-        to: child.id
-      };
-    });
+  createEdges = (children, firstNode) => {
+    const parentEdges = firstNode.parents.map(parent => ({
+      from: parent, // Order to of to and from is reversed for parents
+      to: firstNode.id
+    }));
+    const childEdges = children.map(child => ({
+      from: firstNode.id,
+      to: child.id
+    }));
+    return [...childEdges, ...parentEdges];
+  };
 
-  combineEdgesAndNodes = (selected = HPO[30]) => {
-    console.log('selected', selected);
+  combineEdgesAndNodes(selected = this.state.selected) {
+    //console.log('selected', selected);
     const firstNode = this.createNode(selected);
     const children = firstNode.children.map(child => this.createNode(child));
     const edges = this.createEdges(children, firstNode);
-    return {
-      firstNode,
-      children,
-      edges
-    };
-  };
+    const nodes = [...children, firstNode];
+    return { nodes, edges };
+  }
 
   handleChange = ({ target: { value, id } }) => {
     const { graph } = this.state;
-    this.setState({ selected: value });
     const node = HPO.find(phenotype => phenotype.name === value);
-    const { firstNode, children, edges } = this.combineEdgesAndNodes(node);
+    const { nodes, edges } = this.combineEdgesAndNodes(node);
     this.setState({
-      graph: {
-        ...graph,
-        nodes: [firstNode, ...children],
-        edges
-      }
+      graph: { ...graph, nodes, edges },
+      selected: value
     });
   };
 
@@ -122,7 +111,12 @@ class Phenotypes extends Component {
           handleChange={this.handleChange}
         />
         {graph.nodes &&
-          <StyledGraph graph={graph} options={options} events={events} />}
+          <Graph
+            style={{ width: '90%', height: '90%' }}
+            graph={graph}
+            options={options}
+            events={events}
+          />}
       </Container>
     );
   }
