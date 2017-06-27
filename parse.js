@@ -21,28 +21,25 @@ const parseStanza = stanzaText =>
             stanza.relatives = { parents: [], children: [] };
             stanza.relatives.parents.push(val.split(' ')[0]);
           }
-          if (!Array.isArray(stanza[key])) {
-            stanza[key] = [];
-            stanza[key].push(val);
-          } else {
-            stanza[key] = val;
-          }
+          stanza[key] = val;
           terms[stanza.id] = stanza;
 
           if (stanza.relatives) {
             stanza.relatives.parents.forEach(item => {
-              if (terms[item]) {
-                if (!terms[item].relatives) {
-                  terms[item].relatives = { parents: [], children: [] };
+              const parent = terms[item];
+              if (parent) {
+                if (!parent.relatives) {
+                  parent.relatives = { parents: [], children: [] };
                 }
 
-                terms[item].relatives.children.push(item);
+                parent.relatives.children.push(stanza.id);
               }
             });
           }
         }
         return stanza;
       }, {});
+
       return terms;
     }, {});
 

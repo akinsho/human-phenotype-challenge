@@ -2,30 +2,44 @@ import React, { Component } from 'react';
 import Graph from 'react-graph-vis';
 import data from './../../../hpo.json';
 
-console.log('data', data);
+const hpoArray = Object.values(data);
 
-//const nodes = data.slice(10, 20).map(node => {
-//return {
-//id: node.id,
-//label: node.name[0]
-//};
-//});
+const createNode = node => {
+  if (typeof node === 'string') {
+    const childNode = data[node];
+    const { id, name, relatives: { children } } = childNode;
+    return {
+      id,
+      label: name,
+      children
+    };
+  }
+  const { id, name, relatives: { children } } = node;
+  return {
+    id,
+    label: name,
+    children
+  };
+};
+
+const firstNode = createNode(hpoArray[30]);
+
+const children = firstNode.children.map(child => createNode(child));
+
+const createEdges = children => {
+  return children.map(child => {
+    return {
+      from: firstNode.id,
+      to: child.id
+    };
+  });
+};
+
+const edges = createEdges(children);
 
 const graph = {
-  nodes: [
-    { id: 1, label: 'Node 1' },
-    { id: 2, label: 'Node 2' },
-    { id: 3, label: 'Node 3' },
-    { id: 4, label: 'Node 4' },
-    { id: 5, label: 'Node 5' },
-    { id: 6, label: 'Node 6' }
-  ],
-  edges: [
-    { from: 1, to: 2 },
-    { from: 1, to: 3 },
-    { from: 2, to: 4 },
-    { from: 2, to: 5 }
-  ]
+  nodes: [firstNode, ...children],
+  edges
 };
 
 const options = {
