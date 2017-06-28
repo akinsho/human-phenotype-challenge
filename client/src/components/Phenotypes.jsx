@@ -19,7 +19,7 @@ class Phenotypes extends Component {
   state = {
     input: '',
     results: [],
-    selected: HPO[125],
+    selected: HPO[1],
     graph: {},
     active: {}
   };
@@ -75,6 +75,7 @@ class Phenotypes extends Component {
   }
 
   getAncestors(goid, array = []) {
+    //Recurisively build up an array of all the preceding nodes
     let recursiveArray = [goid, ...array];
     if (data[goid]) {
       const { parents } = data[goid].relatives;
@@ -104,6 +105,7 @@ class Phenotypes extends Component {
     const nodes = removeDuplicateObj(network.nodes, 'id');
     const edges = removeDuplicateObj(network.edges, 'to');
 
+    console.log('network', network);
     this.setState({ graph: { ...graph, nodes, edges } });
   };
 
@@ -112,16 +114,19 @@ class Phenotypes extends Component {
     this.setState({ input: value, results });
   };
 
-  handleSubmit = ({ target: { value }, currentTarget: { textContent } }) => {
+  handleSubmit = event => {
+    //Find the matching phenotype based on input and rerender that with its
+    //parent and children
+    event.preventDefault();
+    const { target: { value }, currentTarget: { textContent } } = event;
     const { graph } = this.state;
-    const node = HPO.find(
-      phenotype => phenotype.name === (value || textContent)
-    );
+    const node = HPO.find(({ name }) => name === (value || textContent));
     const { nodes, edges } = this.combineEdgesAndNodes(node);
     this.setState({
       graph: { ...graph, nodes, edges },
       input: '',
-      selected: node
+      selected: node,
+      results: []
     });
   };
 
@@ -137,6 +142,9 @@ class Phenotypes extends Component {
       this.setState({ active: node });
     },
     doubleClick: event => {
+      if (event.nodes.length < 1) {
+        return console.warn('No node is attached to this event');
+      }
       const { nodes: [evtNode] } = event;
       const node = data[evtNode];
       const { nodes, edges } = this.combineEdgesAndNodes(node);
@@ -158,7 +166,6 @@ class Phenotypes extends Component {
           handleChange={this.handleChange}
           handleSubmit={this.handleSubmit}
         />
-        <Button onClick={this.renderAncestors}>Show Ancestors</Button>
         <ul>
           <li>Double Click to Change Node</li>
           <li>Click Once to get the definition</li>
@@ -168,15 +175,17 @@ class Phenotypes extends Component {
         </ul>
         {graph.nodes &&
           <Graph
-            style={{ width: '90vw', height: '80vh' }}
+            style={{ width: '90vw', height: '60vh' }}
             graph={graph}
             options={options}
             events={this.events}
           />}
+        <Button onClick={this.renderAncestors}>Show Ancestors</Button>
         {active.id &&
           <Active onClick={this.closeActiveBox}>
             <ActiveTitle>{active.name}</ActiveTitle>
             <ActiveBody>{findInDoubleQuotes(active.def)}</ActiveBody>
+            <Button small>Close</Button>
           </Active>}
       </Container>
     );

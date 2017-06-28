@@ -1,5 +1,6 @@
 //Config Object for the Graph component
 const options = {
+  autoResize: true,
   layout: {
     randomSeed: undefined,
     hierarchical: {
@@ -14,7 +15,13 @@ const options = {
     }
   },
   nodes: {
+    chosen: {
+      node: (values, id, selected, hovering) => {
+        values.color = '#26A69A';
+      }
+    },
     color: '#2196F3',
+    borderWidth: 0,
     shape: 'box',
     shapeProperties: {
       borderRadius: 3

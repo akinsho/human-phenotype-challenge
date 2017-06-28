@@ -33,13 +33,16 @@ export const ActiveTitle = styled.h2`
 export const ActiveBody = styled.p`
   height: 80%;
   overflow: scroll;
+  margin: 0.2em;
 `;
 
 export const Button = styled.button`
   border: none;
-  margin: 0.4em;
-  font-size: 1.4em;
-  width: 8em;
+  margin: 0.3em;
+  padding: 0.2em;
+  height: 2.5rem;
+  font-size: ${props => (props.small ? '1em' : '1.4em')};
+  width: ${props => (props.small ? '6em' : '8em')};
   color: white;
   box-shadow: 0 1px 1px rgba(0, 0, 0, 0.5);
   background-color:#2196F3;
