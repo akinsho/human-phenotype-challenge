@@ -14,14 +14,14 @@ const parseStanza = stanzaText =>
       item.split('\n').reduce((stanza, currentLine) => {
         const separatorIndex = currentLine.indexOf(':');
         const key = currentLine.slice(0, separatorIndex);
-        const val = currentLine.slice(separatorIndex + 1).trim();
+        const value = currentLine.slice(separatorIndex + 1).trim();
 
         if (key) {
           if (key === 'is_a') {
             stanza.relatives = { parents: [], children: [] };
-            stanza.relatives.parents.push(val.split(' ')[0]);
+            stanza.relatives.parents.push(value.split(' ')[0]);
           }
-          stanza[key] = val;
+          stanza[key] = value;
           terms[stanza.id] = stanza;
 
           if (stanza.relatives) {

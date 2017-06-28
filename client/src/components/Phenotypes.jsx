@@ -7,7 +7,7 @@ import data from './../../../hpo.json';
 
 const Container = styled.div`
   width: 100%;
-  height: 100%;
+  height: 90%;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -17,9 +17,9 @@ const HPO = Object.values(data);
 
 const options = {
   layout: {
-    //randomSeed: undefined,
+    randomSeed: undefined,
     hierarchical: {
-      enabled: true,
+      enabled: false,
       nodeSpacing: 300
     }
   },
@@ -28,7 +28,8 @@ const options = {
   },
   nodes: {
     color: '#2196F3',
-    shape: 'box'
+    shape: 'box',
+    font: '14px Helvetica black'
   }
 };
 
@@ -40,6 +41,8 @@ const events = {
 
 class Phenotypes extends Component {
   state = {
+    input: '',
+    results: [],
     selected: HPO[125],
     graph: {}
   };
@@ -55,7 +58,7 @@ class Phenotypes extends Component {
    * @param {String or Object} node A phenotype object or the id of one
    * @returns {Object} A graph node with a label, id and its children
    */
-  createNode = node => {
+  createNode = (node, color) => {
     let id, label, relatives, children, parents;
     if (typeof node === 'string') {
       const childNode = data[node];
@@ -63,12 +66,12 @@ class Phenotypes extends Component {
     } else {
       ({ id, name: label, relatives: { children, parents } } = node);
     }
-    return { id, label, children, parents };
+    return { id, label, children, parents, color };
   };
 
   createEdges = (children, firstNode) => {
     const parentEdges = firstNode.parents.map(parent => ({
-      from: parent, // Order to of to and from is reversed for parents
+      from: parent, // Order of to and from is reversed for parents
       to: firstNode.id
     }));
     const childEdges = children.map(child => ({
@@ -80,7 +83,7 @@ class Phenotypes extends Component {
 
   combineEdgesAndNodes(selected = this.state.selected) {
     //console.log('selected', selected);
-    const firstNode = this.createNode(selected);
+    const firstNode = this.createNode(selected, '#B2DFDB');
     const children = firstNode.children.map(child => this.createNode(child));
     const edges = this.createEdges(children, firstNode);
     const nodes = [...children, firstNode];
@@ -88,31 +91,40 @@ class Phenotypes extends Component {
   }
 
   handleChange = ({ target: { value, id } }) => {
+    const results = this.names.filter(({ name }) => name.includes(value));
+    this.setState({ input: value, results });
+  };
+
+  handleSubmit = ({ target: { value }, currentTarget: { textContent } }) => {
     const { graph } = this.state;
-    const node = HPO.find(phenotype => phenotype.name === value);
+    const node = HPO.find(
+      phenotype => phenotype.name === (value || textContent)
+    );
     const { nodes, edges } = this.combineEdgesAndNodes(node);
     this.setState({
       graph: { ...graph, nodes, edges },
+      input: '',
       selected: value
     });
   };
 
-  names = Object.values(data)
-    .map(({ name, id }) => ({ name, id }))
-    .slice(100, 150);
+  //Remove the first value from the data as it hpo meta data
+  names = Object.values(data).slice(1).map(({ name, id }) => ({ name, id }));
 
   render() {
-    const { graph, selected } = this.state;
+    const { graph, input, results } = this.state;
     return (
       <Container>
         <SearchBar
           data={this.names}
-          value={selected}
+          value={input}
+          results={results}
           handleChange={this.handleChange}
+          handleSubmit={this.handleSubmit}
         />
         {graph.nodes &&
           <Graph
-            style={{ width: '90%', height: '90%' }}
+            style={{ width: '70vw', height: '70vh' }}
             graph={graph}
             options={options}
             events={events}
