@@ -57,7 +57,7 @@ function SearchBar({ handleSubmit, handleChange, results, input }) {
   return (
     <Nav>
       <Form onSubmit={handleSubmit}>
-        <Input onChange={handleChange} />
+        <Input value={input} onChange={handleChange} />
       </Form>
       {results.length > 0 &&
         <Results>

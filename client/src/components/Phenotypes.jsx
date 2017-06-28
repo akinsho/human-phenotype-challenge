@@ -1,50 +1,27 @@
 import React, { Component } from 'react';
 import Graph from 'react-graph-vis';
-import styled from 'styled-components';
 import SearchBar from './SearchBar.jsx';
+import options from './GraphConfig.js';
 
+import { findInDoubleQuotes, removeDuplicateObj } from './../utils.js';
+import {
+  Container,
+  Active,
+  ActiveBody,
+  ActiveTitle,
+  Button
+} from './styled.jsx';
 import data from './../../../hpo.json';
 
-const Container = styled.div`
-  width: 100%;
-  height: 90%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-`;
-
 const HPO = Object.values(data);
-
-const options = {
-  layout: {
-    randomSeed: undefined,
-    hierarchical: {
-      enabled: false,
-      nodeSpacing: 300
-    }
-  },
-  edges: {
-    color: '#00000'
-  },
-  nodes: {
-    color: '#2196F3',
-    shape: 'box',
-    font: '14px Helvetica black'
-  }
-};
-
-const events = {
-  select: event => {
-    const { nodes, edges } = event;
-  }
-};
 
 class Phenotypes extends Component {
   state = {
     input: '',
     results: [],
     selected: HPO[125],
-    graph: {}
+    graph: {},
+    active: {}
   };
 
   componentDidMount() {
@@ -110,19 +87,18 @@ class Phenotypes extends Component {
   renderAncestors = () => {
     const { selected: { id }, graph } = this.state;
     const ancestors = this.getAncestors(id);
-    const network = ancestors.map(ancestor =>
-      this.combineEdgesAndNodes(ancestor)
-    );
-    console.log('network', network);
-    const ancestryTree = network.reduce(
-      (acc, { nodes, edges }) => {
-        acc.nodes = [...nodes, ...acc.nodes];
-        acc.edges = [...edges, ...acc.edges];
+    const network = ancestors.reduce(
+      (acc, ancestor) => {
+        const { nodes, edges } = this.combineEdgesAndNodes(ancestor);
+        acc.nodes.push(...nodes);
+        acc.edges.push(...edges);
         return acc;
       },
       { nodes: [], edges: [] }
     );
-    const { nodes, edges } = ancestryTree;
+    const nodes = removeDuplicateObj(network.nodes, 'id');
+    const edges = removeDuplicateObj(network.edges, 'to');
+
     this.setState({ graph: { ...graph, nodes, edges } });
   };
 
@@ -144,12 +120,24 @@ class Phenotypes extends Component {
     });
   };
 
+  closeActiveBox = () => {
+    this.setState({ active: {} });
+  };
+
+  events = {
+    select: event => {
+      const { graph } = this.state;
+      const { nodes: [nodes], edges } = event;
+      const node = data[nodes];
+      this.setState({ active: node });
+    }
+  };
+
   //Remove the first value from the data as it is hpo meta data
   names = Object.values(data).slice(1).map(({ name, id }) => ({ name, id }));
 
   render() {
-    const { graph, input, results } = this.state;
-    console.log('state', this.state.graph);
+    const { graph, input, results, active } = this.state;
     return (
       <Container>
         <SearchBar
@@ -159,14 +147,19 @@ class Phenotypes extends Component {
           handleChange={this.handleChange}
           handleSubmit={this.handleSubmit}
         />
-        <button onClick={this.renderAncestors}>Show Ancestors</button>
+        <Button onClick={this.renderAncestors}>Show Ancestors</Button>
         {graph.nodes &&
           <Graph
-            style={{ width: '70vw', height: '70vh' }}
+            style={{ width: '90vw', height: '80vh' }}
             graph={graph}
             options={options}
-            events={events}
+            events={this.events}
           />}
+        {active.id &&
+          <Active onClick={this.closeActiveBox}>
+            <ActiveTitle>{active.name}</ActiveTitle>
+            <ActiveBody>{findInDoubleQuotes(active.def)}</ActiveBody>
+          </Active>}
       </Container>
     );
   }
