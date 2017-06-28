@@ -92,6 +92,40 @@ class Phenotypes extends Component {
     return { nodes, edges };
   }
 
+  getAncestors(goid, array = []) {
+    let recursiveArray = [goid, ...array];
+    if (data[goid]) {
+      const { parents } = data[goid].relatives;
+      if (!parents.length) {
+        return recursiveArray;
+      } else if (parents.length > 0) {
+        const [result] = parents.map(parent =>
+          this.getAncestors(parent, recursiveArray)
+        );
+        return result;
+      }
+    }
+  }
+
+  renderAncestors = () => {
+    const { selected: { id }, graph } = this.state;
+    const ancestors = this.getAncestors(id);
+    const network = ancestors.map(ancestor =>
+      this.combineEdgesAndNodes(ancestor)
+    );
+    console.log('network', network);
+    const ancestryTree = network.reduce(
+      (acc, { nodes, edges }) => {
+        acc.nodes = [...nodes, ...acc.nodes];
+        acc.edges = [...edges, ...acc.edges];
+        return acc;
+      },
+      { nodes: [], edges: [] }
+    );
+    const { nodes, edges } = ancestryTree;
+    this.setState({ graph: { ...graph, nodes, edges } });
+  };
+
   handleChange = ({ target: { value, id } }) => {
     const results = this.names.filter(({ name }) => name.includes(value));
     this.setState({ input: value, results });
@@ -106,7 +140,7 @@ class Phenotypes extends Component {
     this.setState({
       graph: { ...graph, nodes, edges },
       input: '',
-      selected: value
+      selected: node
     });
   };
 
@@ -115,6 +149,7 @@ class Phenotypes extends Component {
 
   render() {
     const { graph, input, results } = this.state;
+    console.log('state', this.state.graph);
     return (
       <Container>
         <SearchBar
@@ -124,6 +159,7 @@ class Phenotypes extends Component {
           handleChange={this.handleChange}
           handleSubmit={this.handleSubmit}
         />
+        <button onClick={this.renderAncestors}>Show Ancestors</button>
         {graph.nodes &&
           <Graph
             style={{ width: '70vw', height: '70vh' }}
