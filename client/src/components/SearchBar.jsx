@@ -53,11 +53,21 @@ const Form = styled.form`
   height: 2em
 `;
 
+const Title = styled.h1`
+  color: white;
+  margin: 0.3em;
+`;
+
 function SearchBar({ handleSubmit, handleChange, results, input }) {
   return (
     <Nav>
+      <Title>Human Phenotype Ontology</Title>
       <Form onSubmit={handleSubmit}>
-        <Input value={input} onChange={handleChange} />
+        <Input
+          placeholder="Search for a Phenotype"
+          value={input}
+          onChange={handleChange}
+        />
       </Form>
       {results.length > 0 &&
         <Results>

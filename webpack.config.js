@@ -7,7 +7,7 @@ module.exports = {
   context: __dirname + '/client/src', //root of project
   entry: ['babel-polyfill', './index.js'],
   output: {
-    path: __dirname + '/build',
+    path: __dirname + '/client/build',
     filename: 'bundle.js'
   },
 

@@ -59,5 +59,5 @@ async function fetchAndParse(url) {
   fs.writeFileSync('hpo.json', JSON.stringify(data, null, 2));
   return data;
 }
-
-module.exports = fetchAndParse(oboURL);
+fetchAndParse(oboURL);
+module.exports = fetchAndParse
