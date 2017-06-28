@@ -40,8 +40,10 @@ class Phenotypes extends Component {
     if (typeof node === 'string') {
       const childNode = data[node];
       ({ id, name: label, relatives: { children, parents } } = childNode);
-    } else {
+    } else if (node.relatives) {
       ({ id, name: label, relatives: { children, parents } } = node);
+    } else {
+      return console.warn('Node does not have requisite props');
     }
     return { id, label, children, parents, color };
   };
@@ -60,6 +62,9 @@ class Phenotypes extends Component {
 
   combineEdgesAndNodes(selected = this.state.selected) {
     const firstNode = this.createNode(selected, '#B2DFDB');
+    if (!firstNode) {
+      return console.warn('No node created');
+    }
     const parents = firstNode.parents.map(parent =>
       this.createNode(parent, 'red')
     );
@@ -130,6 +135,12 @@ class Phenotypes extends Component {
       const { nodes: [nodes], edges } = event;
       const node = data[nodes];
       this.setState({ active: node });
+    },
+    doubleClick: event => {
+      const { nodes: [evtNode] } = event;
+      const node = data[evtNode];
+      const { nodes, edges } = this.combineEdgesAndNodes(node);
+      this.setState({ graph: { nodes, edges }, selected: node });
     }
   };
 
@@ -148,6 +159,13 @@ class Phenotypes extends Component {
           handleSubmit={this.handleSubmit}
         />
         <Button onClick={this.renderAncestors}>Show Ancestors</Button>
+        <ul>
+          <li>Double Click to Change Node</li>
+          <li>Click Once to get the definition</li>
+          <li>
+            Search for a Phenotype in using the search and Click the result you want!
+          </li>
+        </ul>
         {graph.nodes &&
           <Graph
             style={{ width: '90vw', height: '80vh' }}

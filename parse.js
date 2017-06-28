@@ -49,7 +49,7 @@ async function fetchAndParse(url) {
   const data = await fetch(url)
     .then(res => res.text())
     .then(text => {
-      if (!fs.existsSync('HPO.obo')) {
+      if (!process.env.PORT && !fs.existsSync('HPO.obo')) {
         fs.writeFileSync('HPO.obo', text);
       }
       return parseStanza(text);
@@ -60,4 +60,4 @@ async function fetchAndParse(url) {
   return data;
 }
 fetchAndParse(oboURL);
-module.exports = fetchAndParse
+module.exports = fetchAndParse;

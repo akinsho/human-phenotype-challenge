@@ -37,7 +37,7 @@ export const ActiveBody = styled.p`
 
 export const Button = styled.button`
   border: none;
-  margin: 1em;
+  margin: 0.4em;
   font-size: 1.4em;
   width: 8em;
   color: white;

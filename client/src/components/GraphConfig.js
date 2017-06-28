@@ -8,7 +8,10 @@ const options = {
     }
   },
   edges: {
-    color: '#00000'
+    color: '#00000',
+    smooth: {
+      enabled: true
+    }
   },
   nodes: {
     color: '#2196F3',
