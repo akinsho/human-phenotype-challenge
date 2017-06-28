@@ -82,11 +82,13 @@ class Phenotypes extends Component {
   };
 
   combineEdgesAndNodes(selected = this.state.selected) {
-    //console.log('selected', selected);
     const firstNode = this.createNode(selected, '#B2DFDB');
+    const parents = firstNode.parents.map(parent =>
+      this.createNode(parent, 'red')
+    );
     const children = firstNode.children.map(child => this.createNode(child));
     const edges = this.createEdges(children, firstNode);
-    const nodes = [...children, firstNode];
+    const nodes = [...children, ...parents, firstNode];
     return { nodes, edges };
   }
 
@@ -108,7 +110,7 @@ class Phenotypes extends Component {
     });
   };
 
-  //Remove the first value from the data as it hpo meta data
+  //Remove the first value from the data as it is hpo meta data
   names = Object.values(data).slice(1).map(({ name, id }) => ({ name, id }));
 
   render() {

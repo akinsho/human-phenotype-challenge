@@ -23,9 +23,11 @@ const Results = styled.div`
 `;
 
 const Result = styled.div`
-  white-space: wrap;
+  display: block;
+  white-space: nowrap;
   font-size: 0.8em;
-  border-radius: 4px;
+  border-radius: 2px;
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.5);
   background-color: whitesmoke;
   width: 23%;
   height: 2.2em;
@@ -54,7 +56,9 @@ const Form = styled.form`
 function SearchBar({ handleSubmit, handleChange, results, input }) {
   return (
     <Nav>
-      <Form onSubmit={handleSubmit}><Input onChange={handleChange} /></Form>
+      <Form onSubmit={handleSubmit}>
+        <Input onChange={handleChange} />
+      </Form>
       {results.length > 0 &&
         <Results>
           {results.slice(0, 16).map(({ name, id }) => {
