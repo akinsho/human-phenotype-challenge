@@ -90,12 +90,15 @@ class Phenotypes extends Component {
   }
 
   renderAncestors = () => {
+    //Use array of ancestor ids to create edges then for each create a node
+    //with its children and replace graph nodes with that
     const { selected: { id }, graph } = this.state;
     const ancestors = this.getAncestors(id);
     const { nodes, edges } = ancestors.reduce(
       (acc, ancestor) => {
-        const { nodes, edges } = this.combineEdgesAndNodes(ancestor);
-        acc.nodes = [...nodes, ...acc.nodes];
+        const node = this.createNode(ancestor);
+        const edges = this.createEdges(node.children, node);
+        acc.nodes = [node, ...acc.nodes];
         acc.edges = [...edges, ...acc.edges];
         return acc;
       },
