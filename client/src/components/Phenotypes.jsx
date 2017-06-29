@@ -176,7 +176,7 @@ class Phenotypes extends Component {
           handleChange={this.handleChange}
           handleSubmit={this.handleSubmit}
         />
-        {error && <div>Woops that didn't work</div>}
+        {error && <div>Woops that didn't work 🙇🏾</div>}
         <ul>
           <li>Double Click to Change Node</li>
           <li>Click Once to get the definition</li>
