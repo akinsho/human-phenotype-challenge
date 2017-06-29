@@ -19,7 +19,7 @@ class Phenotypes extends Component {
   state = {
     input: '',
     results: [],
-    selected: HPO[1],
+    selected: data['HP:0000118'],
     graph: {},
     active: {},
     error: ''
@@ -33,7 +33,7 @@ class Phenotypes extends Component {
   /**
    * Takes a phenotype object or id and returns a graph node object
    *
-   * @param {String or Object} node A phenotype object or the id of one
+   * @param {String or Object} A phenotype object or the id of one
    * @returns {Object} A graph node with a label, id and its children
    */
   createNode = (node, color) => {
@@ -63,11 +63,12 @@ class Phenotypes extends Component {
 
   combineEdgesAndNodes(selected = this.state.selected) {
     const firstNode = this.createNode(selected, '#B2DFDB');
-    let parents;
     if (!firstNode) {
       return console.warn('No node created');
     }
-    parents = firstNode.parents.map(parent => this.createNode(parent, 'red'));
+    const parents = firstNode.parents.map(parent =>
+      this.createNode(parent, 'red')
+    );
     const children = firstNode.children.map(child => this.createNode(child));
     const edges = this.createEdges(children, firstNode);
     const nodes = [...children, ...parents, firstNode];
@@ -75,7 +76,7 @@ class Phenotypes extends Component {
   }
 
   getAncestors(goid, array = []) {
-    //Recurisively build up an array of all the preceding nodes
+    //Recursively build up an array of all the preceding/ancestor nodes
     let recursiveArray = [goid, ...array];
     if (data[goid]) {
       const { parents } = data[goid].relatives;
@@ -147,8 +148,9 @@ class Phenotypes extends Component {
   events = {
     select: event => {
       const { graph } = this.state;
-      const { nodes: [nodes], edges } = event;
-      const node = data[nodes];
+      const { nodes: [evtNode], edges } = event;
+      const node = data[evtNode];
+      console.log('evtNode', evtNode);
       this.setState({ active: node });
     },
     doubleClick: event => {
@@ -180,9 +182,7 @@ class Phenotypes extends Component {
         <ul>
           <li>Double Click to Change Node</li>
           <li>Click Once to get the definition</li>
-          <li>
-            Search for a Phenotype in using the search and Click the result you want!
-          </li>
+          <li> Search for a Phenotype and Click the result you want! </li>
         </ul>
         {graph.nodes &&
           <Graph
