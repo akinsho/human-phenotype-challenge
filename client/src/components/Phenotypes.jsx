@@ -21,7 +21,8 @@ class Phenotypes extends Component {
     results: [],
     selected: HPO[1],
     graph: {},
-    active: {}
+    active: {},
+    error: ''
   };
 
   componentDidMount() {
@@ -90,6 +91,7 @@ class Phenotypes extends Component {
   }
 
   renderAncestors = () => {
+    //TODO this functions behaviour is erratic
     //Use array of ancestor ids to create edges then for each create a node
     //with its children and replace graph nodes with that
     const { selected: { id }, graph } = this.state;
@@ -105,12 +107,16 @@ class Phenotypes extends Component {
       { nodes: [], edges: [] }
     );
 
-    this.setState({
-      graph: {
-        nodes: removeDuplicateObj([...graph.nodes, ...nodes], 'id'),
-        edges: removeDuplicateObj([...graph.edges, ...edges], 'to')
-      }
-    });
+    try {
+      this.setState({
+        graph: {
+          nodes: removeDuplicateObj([...graph.nodes, ...nodes], 'id'),
+          edges: removeDuplicateObj([...graph.edges, ...edges], 'to')
+        }
+      });
+    } catch (e) {
+      this.setState({ error: e });
+    }
   };
 
   handleChange = ({ target: { value, id } }) => {
@@ -160,7 +166,7 @@ class Phenotypes extends Component {
   names = Object.values(data).slice(1).map(({ name, id }) => ({ name, id }));
 
   render() {
-    const { graph, input, results, active } = this.state;
+    const { graph, input, results, active, error } = this.state;
     return (
       <Container>
         <SearchBar
@@ -170,6 +176,7 @@ class Phenotypes extends Component {
           handleChange={this.handleChange}
           handleSubmit={this.handleSubmit}
         />
+        {error && <div>Woops that didn't work</div>}
         <ul>
           <li>Double Click to Change Node</li>
           <li>Click Once to get the definition</li>
