@@ -17,6 +17,14 @@ injectGlobal`
   * {
     box-sizing: inherit
   }
+
+  .results-enter {
+    opacity: 0.01
+  }
+  .results-enter.results-enter-active {
+    opacity: 1;
+    transition: opacity 300ms ease-in;
+  }
 `;
 
 const AppWrapper = styled.div`

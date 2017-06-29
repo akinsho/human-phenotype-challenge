@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import styled from 'styled-components';
-import data from './../../../hpo.json';
+import { CSSTransitionGroup } from 'react-transition-group';
 
 const Nav = styled.nav`
   width: 100%;
@@ -58,27 +58,34 @@ const Title = styled.h1`
   margin: 0.3em;
 `;
 
-function SearchBar({ handleSubmit, handleChange, results, input }) {
+function SearchBar({ handleSubmit, handleChange, results, value }) {
   return (
     <Nav>
       <Title>Human Phenotype Ontology</Title>
       <Form onSubmit={handleSubmit}>
         <Input
           placeholder="Search for a Phenotype"
-          value={input}
+          value={value}
           onChange={handleChange}
         />
       </Form>
-      {results.length > 0 &&
-        <Results>
-          {results.slice(0, 16).map(({ name, id }) => {
-            return (
-              <Result value={input} onClick={handleSubmit} key={id}>
-                {name}
-              </Result>
-            );
-          })}
-        </Results>}
+      <CSSTransitionGroup
+        transitionName="results"
+        transitionEnterTimeout={300}
+        transitionLeave={false}
+      >
+        {results.length > 0 &&
+          value &&
+          <Results key={results[0].id}>
+            {results.slice(0, 16).map(({ name, id }) => {
+              return (
+                <Result onClick={handleSubmit} key={id}>
+                  {name}
+                </Result>
+              );
+            })}
+          </Results>}
+      </CSSTransitionGroup>
     </Nav>
   );
 }

@@ -28,6 +28,7 @@
     "react": "^15.5.4",
     "react-dom": "^15.5.4",
     "react-graph-vis": "^0.1.2",
+    "react-transition-group": "^1.2.0",
     "styled-components": "^2.1.0"
   }
 }
