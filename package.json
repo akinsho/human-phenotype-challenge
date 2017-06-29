@@ -8,6 +8,7 @@
   "scripts": {
     "start": "webpack-dev-server",
     "build": "webpack -p",
+    "local": "node parse.js",
     "serve:build": "node ./server.js"
   },
   "devDependencies": {
