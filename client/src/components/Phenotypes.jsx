@@ -62,12 +62,11 @@ class Phenotypes extends Component {
 
   combineEdgesAndNodes(selected = this.state.selected) {
     const firstNode = this.createNode(selected, '#B2DFDB');
+    let parents;
     if (!firstNode) {
       return console.warn('No node created');
     }
-    const parents = firstNode.parents.map(parent =>
-      this.createNode(parent, 'red')
-    );
+    parents = firstNode.parents.map(parent => this.createNode(parent, 'red'));
     const children = firstNode.children.map(child => this.createNode(child));
     const edges = this.createEdges(children, firstNode);
     const nodes = [...children, ...parents, firstNode];
@@ -93,20 +92,22 @@ class Phenotypes extends Component {
   renderAncestors = () => {
     const { selected: { id }, graph } = this.state;
     const ancestors = this.getAncestors(id);
-    const network = ancestors.reduce(
+    const { nodes, edges } = ancestors.reduce(
       (acc, ancestor) => {
         const { nodes, edges } = this.combineEdgesAndNodes(ancestor);
-        acc.nodes.push(...nodes);
-        acc.edges.push(...edges);
+        acc.nodes = [...nodes, ...acc.nodes];
+        acc.edges = [...edges, ...acc.edges];
         return acc;
       },
       { nodes: [], edges: [] }
     );
-    const nodes = removeDuplicateObj(network.nodes, 'id');
-    const edges = removeDuplicateObj(network.edges, 'to');
 
-    console.log('network', network);
-    this.setState({ graph: { ...graph, nodes, edges } });
+    this.setState({
+      graph: {
+        nodes: removeDuplicateObj([...graph.nodes, ...nodes], 'id'),
+        edges: removeDuplicateObj([...graph.edges, ...edges], 'to')
+      }
+    });
   };
 
   handleChange = ({ target: { value, id } }) => {
